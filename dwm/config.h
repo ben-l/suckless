@@ -1,8 +1,13 @@
+#include <X11/XF86keysym.h>
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
+static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
+static const unsigned int systrayspacing = 2;   /* systray spacing */
+static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
+static const int showsystray        = 1;     /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *fonts[]          = { "mono:pixelsize=15" };
@@ -61,36 +66,57 @@ static const char *termcmd[]  = { "st", NULL };
 static const char *cmdsoundup[] = { "amixer", "-q", "sset", "Master", "5%+", NULL };
 static const char *cmdsounddown[] = { "amixer", "-q", "sset", "Master", "5%-", NULL };
 static const char *cmdsoundmute[] = { "amixer", "-q", "sset", "Master", "toggle", NULL };
+static const char *ncmpcpp[] = { "st", "-e", "ncmpcpp", NULL };
+static const char *newsboat[] = { "st", "-e", "newsboat", NULL };
+static const char *mpctoggle[] = { "mpc", "toggle", "-p", "6600", NULL };
+static const char *mpcprev[] = { "mpc", "prev", "-p", "6600", NULL };
+static const char *mpcnext[] = { "mpc", "next", "-p", "6600", NULL };
+static const char *mpcforward[] = { "mpc", "seek", "+", NULL };
+static const char *mpcbackward[] = { "mpc", "seek", "-", NULL };
+static const char *ranger[]  = { "st", "-e", "ranger", NULL };
+static const char *lightincrease[]  = { "light", "-A", "5", NULL };
+static const char *lightdecrease[]  = { "light", "-U", "5", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+	{ MODKEY,                       XK_o,      spawn,          {.v = dmenucmd } },
+	{ MODKEY,                       XK_r,      spawn,          {.v = ranger } },
 	{ MODKEY,             		XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_v,      incnmaster,     {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_h,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
 	{ MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY|ShiftMask,             XK_q,      killclient,     {0} },
+	{ MODKEY,             		XK_BackSpace,     killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY|ShiftMask,             XK_m,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
-	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
-	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,			XK_equal,  spawn,	   {.v = cmdsoundup } },
+	{ MODKEY,                       XK_bracketleft,  focusmon,       {.i = -1 } },
+	{ MODKEY,                       XK_bracketright, focusmon,       {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_bracketleft,  tagmon,         {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_bracketright, tagmon,         {.i = +1 } },
+	{ MODKEY,			XF86XK_AudioRaiseVolume,  spawn,	   {.v = cmdsoundup } },
+	{ MODKEY,			XF86XK_AudioLowerVolume,  spawn,	   {.v = cmdsounddown } },
+	{ MODKEY,			XK_m, 	   spawn,   	   {.v = cmdsoundmute } },
 	{ MODKEY,			XK_minus,  spawn,	   {.v = cmdsounddown } },
-	{ MODKEY,			XK_Delete, spawn,	   {.v = cmdsoundmute } },
-			
+	{ MODKEY,			XK_equal,  spawn,	   {.v = cmdsoundup } },
+	{ MODKEY|ShiftMask,		XK_minus,  spawn,	   {.v = lightdecrease } },
+	{ MODKEY|ShiftMask,		XK_equal,  spawn,	   {.v = lightincrease } },
+	{ MODKEY|ShiftMask,		XK_p, 	   spawn,	   {.v = ncmpcpp } },
+	{ MODKEY,			XK_n, 	   spawn,	   {.v = newsboat } },
+	{ MODKEY,             		XK_comma,  spawn,      	   {.v = mpcbackward } },
+	{ MODKEY,             		XK_period, spawn,      	   {.v = mpcforward } },
+	{ MODKEY|ShiftMask,             XK_comma,  spawn,      	   {.v = mpcprev } },
+	{ MODKEY|ShiftMask,             XK_period, spawn,          {.v = mpcnext } },
+	{ MODKEY,             		XK_p, 	   spawn,          {.v = mpctoggle } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
