@@ -11,7 +11,7 @@ static const int showsystray        = 1;     /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *fonts[]          = { "mono:pixelsize=15" };
-static const char dmenufont[]       = "mono:pixelsize=15";
+static const char dmenufont[]       = "mono:pixelsize=21";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -74,6 +74,7 @@ static const char *mpcnext[] = { "mpc", "next", "-p", "6600", NULL };
 static const char *mpcforward[] = { "mpc", "seek", "+", NULL };
 static const char *mpcbackward[] = { "mpc", "seek", "-", NULL };
 static const char *ranger[]  = { "st", "-e", "ranger", NULL };
+/* Light requires user to be in the video group */
 static const char *lightincrease[]  = { "light", "-A", "5", NULL };
 static const char *lightdecrease[]  = { "light", "-U", "5", NULL };
 
